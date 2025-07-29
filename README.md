@@ -1,0 +1,1 @@
+Inserta las carateristicas que gustes y encuetra el precio tu laptop ideal en esta app: https://laptopmultiplelinearregretionandrecomendator-keotwl6tmxqrwtlyz.streamlit.app/ y no solo eso, podras tambien encotrar las laptops mas similares que tiene la tienda en stock gracias a un sistema de recomendacion que viene tambien integrado en la app
