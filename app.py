@@ -2,16 +2,17 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 # Importar todas las funciones necesarias desde el archivo functions.py
-from functions import load_data_and_train_model, prepare_df_for_similarity, calculate_numerical_ranges, predict_laptop_price, get_laptop_recommendations
+from functions import load_all_resources, calculate_numerical_ranges, predict_laptop_price, get_laptop_recommendations
 
 # --- Configuración de la página de Streamlit (DEBE SER LO PRIMERO) ---
 st.set_page_config(layout="wide")
 
 # --- Carga de Datos y Modelo (Caché) ---
-# Estas funciones se ejecutan una vez gracias a st.cache_resource y st.cache_data
-df_original, lambdas, categorical_cols, model, model_features_X, similarity_features = load_data_and_train_model()
-df_for_similarity = prepare_df_for_similarity(df_original, lambdas, categorical_cols, similarity_features)
-numerical_ranges = calculate_numerical_ranges(df_original)
+# Se utiliza una única función para cargar todos los recursos una sola vez.
+(df_original, lambdas, categorical_cols, model, 
+ model_features_X, similarity_features, 
+ df_for_similarity, numerical_ranges, 
+ normalization_params) = load_all_resources()
 
 # --- 4. Interfaz de Usuario en Streamlit ---
 st.title(" Predicción del Precio de Laptops 💻")
@@ -89,8 +90,9 @@ if st.button("Predecir Precio"):
 
     try:
         # Llamar a la función de predicción desde functions.py
+        # Se pasa el nuevo parámetro `normalization_params`
         predicted_price_euros, user_laptop_for_similarity = predict_laptop_price(
-            input_data, model, lambdas, categorical_cols, model_features_X, similarity_features
+            input_data, model, lambdas, categorical_cols, model_features_X, similarity_features, normalization_params
         )
 
         # Almacenar en session_state para persistencia
@@ -143,9 +145,9 @@ if st.session_state.user_laptop_for_similarity is not None and st.session_state.
                     df_original,
                     df_for_similarity,
                     numerical_ranges,
-                    lambdas 
+                    normalization_params
                 )
-                st.subheader("Las 5 Laptops Más Similares (Sin Priorización):")
+            st.subheader("Las 5 Laptops Más Similares (Sin Priorización):")
         else:
             with st.spinner('Buscando laptops similares con tus prioridades...'):
                 final_recommended_laptops = get_laptop_recommendations(
@@ -155,9 +157,9 @@ if st.session_state.user_laptop_for_similarity is not None and st.session_state.
                     df_original,
                     df_for_similarity,
                     numerical_ranges,
-                    lambdas 
+                    normalization_params
                 )
-                st.subheader("Las 5 Laptops Más Similares (Priorizadas):")
+            st.subheader("Las 5 Laptops Más Similares (Priorizadas):")
         
         # Columnas a mostrar en la tabla de resultados
         display_cols = [
